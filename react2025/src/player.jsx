@@ -21,7 +21,8 @@ function PlayerCard({ slug }) {
   if (!player) return <p className="text-center text-red-500">Player not found.</p>;
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white shadow-xl rounded-xl overflow-hidden p-6 border border-gray-200">
+  <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="max-w-md w-full bg-white shadow-xl rounded-xl overflow-hidden p-6 border border-gray-200">
       <h2 className="text-2xl font-bold text-center mb-4 text-blue-700">{player.playerName}</h2>
 
       <img
@@ -37,7 +38,9 @@ function PlayerCard({ slug }) {
         ))}
       </ul>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default PlayerCard;

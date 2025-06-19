@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
+import PlayerCard from './player';
 
 function App() {
   const [showText, setShowText] = useState(false);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      {!showText ? (
-        <button onClick={() => setShowText(true)}>Show</button>
-      ) : (
-        <p>This is the example text!</p>
-      )}
-    </div>
+        <PlayerCard slug="babar-azam" />
   );
 }
 

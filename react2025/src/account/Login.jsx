@@ -1,6 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-function Login() {
+import { login as authLogin } from '../store/authSlice'
+import { Link,useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import authService from '../appwrite/auth' 
+import { useDispatch } from 'react-redux';
+function Login(){
+
+  const { register, handleSubmit  } = useForm();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [error, setError] = React.useState("");
+
+  const login = async (data) =>{
+    setError("");
+    try{
+       const session = await authService.login(data);
+        if(session){
+          const userData = authService.getCurrentUser();
+          if(userData) dispatch(authLogin({ userData }));
+          navigate('/success');
+        }
+    } catch(error){
+      setError(error.message);
+    }
+  }  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -12,7 +36,10 @@ function Login() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form method="POST" action="#">
+        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}  
+          <form onSubmit={handleSubmit(login)}>
+
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-5 text-gray-700">
                 Email address
@@ -23,8 +50,11 @@ function Login() {
                   name="email"
                   type="email"
                   placeholder="user@example.com"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                  {...register('email', { required: true,validate: {
+                              matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                              "Email address must be a valid address",
+                    } })}
                 />
               </div>
             </div>
@@ -38,8 +68,8 @@ function Login() {
                   id="password"
                   name="password"
                   type="password"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                  {...register('password', { required: true})}
                 />
               </div>
             </div>

@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
-import PlayerCard from './player';
-import Signup from './login/Signup';
-import Login from './login/Login'
+import React, { useEffect, useState } from 'react';
+import LoggedIN from './account/LoggedIn';
+import LogOutBtn from './account/LogOutBtn';
+import authService from './appwrite/auth';
+import Login from './account/Login';
+
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    authService.getCurrentUser()
+      .then((userData) => {
+        setUser(userData);
+      })
+      .catch(() => {
+        setUser(null); // not logged in
+      });
+  }, [user]);
+
   return (
-    <Login />
-    
-    // <div classNameName="min-h-screen flex flex-col items-center justify-center bg-gray-800 text-white space-y-6">
-    //   <PlayerCard slug="babar-azam" />
-    //   <div classNameName="bg-white p-4 rounded-lg">
-    //     <p classNameName="!text-red-500 text-lg font-semibold">Tailwind is working ✅</p>
-    //   </div>
-    // </div>
+    <>
+      {user ? (
+        <>
+          <LoggedIN />
+          <LogOutBtn />
+        </>
+      ) : (
+        <Login />
+      )}
+    </>
   );
 }
-
 
 export default App;

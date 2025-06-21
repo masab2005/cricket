@@ -32,6 +32,20 @@ export class Service{
     return this.bucket.getFileView(config.appwriteBucketId, fileId).toString();
 }
 
+// user 
+  async createUser({$id, name}) {
+    try {
+      const user = await this.databases.createDocument(
+        config.appwriteDatabaseId,
+        config.appwriteUserCollectionId,
+        $id,
+        { username : name, score : 0,currentPlayer : "babar-azam" }
+      );
+      return user;
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  }
 }
 
 const service = new Service();

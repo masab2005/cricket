@@ -3,6 +3,7 @@ import { login as authLogin } from '../store/authSlice'
 import { Link,useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import authService from '../appwrite/auth' 
+import conf from '../appwrite/conf';
 import { useDispatch } from 'react-redux';
 
 function Signup() {
@@ -19,6 +20,7 @@ function Signup() {
             const userData = await authService.getCurrentUser();
             if(userData) {
                 dispatch(authLogin({ userData }));
+                await conf.createUser(userData)
                 navigate('/success');
             }
         }

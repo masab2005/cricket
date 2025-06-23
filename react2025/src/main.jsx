@@ -5,16 +5,16 @@ import { Provider } from 'react-redux'
 import { createBrowserRouter } from 'react-router-dom'
 import Login from './account/Login.jsx'
 import Signup from './account/Signup.jsx'
-import Success from './game/Game.jsx'
 import App from './App.jsx'
 import store from './store/store.js'
 import './index.css'
+import GameWrapper from './game/GameWrapper.jsx'
  
 const routers = createBrowserRouter([
   { path: '/', element: <App /> },
   { path: '/login', element: <Login /> },
   { path: '/signup', element: <Signup /> },
-  { path: '/success', element: <Success /> }
+  { path: '/game', element: <GameWrapper /> }
 ]);
 
 createRoot(document.getElementById('root')).render(

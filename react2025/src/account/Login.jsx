@@ -4,6 +4,8 @@ import { Link,useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import authService from '../appwrite/auth' 
 import { useDispatch } from 'react-redux';
+import service from '../appwrite/conf.js';
+import { updateUserData } from '../store/authSlice.js';
 function Login(){
 
   const { register, handleSubmit  } = useForm();
@@ -17,8 +19,12 @@ function Login(){
        const session = await authService.login(data);
         if(session){
           const userData = authService.getCurrentUser();
-          if(userData) dispatch(authLogin({ userData }));
-          navigate('/success');
+          if(userData){ 
+               dispatch(authLogin({ userData : userData }));
+               const gameData =  await service.getUserInfo(userData.$id);
+               dispatch(updateUserData({ userGameData : gameData }));
+               navigate('/game');
+          }
         }
     } catch(error){
       setError(error.message);

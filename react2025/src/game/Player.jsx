@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import service from "./appwrite/conf"; // adjust path if needed
+import service from "../appwrite/conf"; // adjust path if needed
 
-function PlayerCard({ slug }) {
+function PlayerCard({ index }) {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
   async function fetchPlayer() {
-    console.log("Fetching player with slug:", slug); // log this
-    const data = await service.getPlayer(slug);
+    console.log("Fetching player with index:", index); // log this
+    const data = await service.getPlayer(index);
     console.log("Fetched player data:", data); // see what comes back
     if (data) setPlayer(data);
     setLoading(false);
   }
 
   fetchPlayer();
-}, [slug]);
+}, [index]);
 
   if (loading) return <p className="text-center text-gray-500">Loading player info...</p>;
   if (!player) return <p className="text-center text-red-500">Player not found.</p>;

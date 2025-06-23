@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import service from '../appwrite/conf.js';
+import Result from './Result.jsx';
+import { useSelector } from 'react-redux';
 
 const hintLabels = [
   "Country",
@@ -13,14 +15,16 @@ const hintLabels = [
 
 
 
-function Game() {
-
+function Game({onNext}) {
+  const userGameData = useSelector((state) => state.auth.userGameData);
+  const userData = useSelector((state) => state.auth.userData);
   const [ correctAnswer,setCorrectAnswer ] = useState("")
   const [revealedHints, setRevealedHints] = useState([]);
   const [guess, setGuess] = useState('');
   const [isCorrect, setIsCorrect] = useState(null);
   const [ hintValues,setHintValues ] = useState([])
   const [count,setCount] = useState(6);
+  const [imageUrl, setImageUrl] = useState("");
   const maxScore = 100;
   const scorePerHint = 10;
   const currentScore = maxScore - revealedHints.length * scorePerHint;
@@ -28,10 +32,13 @@ function Game() {
 useEffect(() => {
   async function fetchPlayer() {
     try {
-      const player = await service.getPlayer("babar-azam");
+      console.log("Fetching player data for index:", userGameData);
+      console.log("user data", userData);
+      const player = await service.getPlayer(userGameData.currentIndex); 
       if (player) {
         setHintValues(player.hints);
         setCorrectAnswer(player.playerName);
+        setImageUrl(service.getFilePreview(player.imageID));
         console.log("Fetched correct answer:", player.playerName);
       } else {
         console.log("Player not found");
@@ -64,20 +71,41 @@ useEffect(() => {
 
   useEffect(() => {
   if (isCorrect !== null) {
+    if(isCorrect === true) {
+      setIsCorrect(true);
+    }
+    else{
     const timer = setTimeout(() => {
       setIsCorrect(null);
     }, 3000);
 
-    return () => clearTimeout(timer); // cleanup
+    return () => clearTimeout(timer);
+  }
   }
 }, [isCorrect]);
-  console.log("RAW Guess:", guess);
-  console.log("RAW Answer:", correctAnswer);
-  console.log("Normalized Guess:", guess.trim().toLowerCase());
-  console.log("Normalized Answer:", correctAnswer.trim().toLowerCase());
-  console.log("Are they equal?", guess.trim().toLowerCase() === correctAnswer.trim().toLowerCase());
 
-
+  if (isCorrect === true) {
+    return (
+      <Result
+    isCorrect={true}
+    correctAnswer={correctAnswer}
+    currentScore={currentScore}
+    imageUrl={imageUrl}
+    onNext={onNext}
+  />
+    );
+  }
+  if (count === 0 && !isCorrect) {
+    return (
+      <Result
+        isCorrect={false}
+        correctAnswer={correctAnswer}
+        currentScore={currentScore}
+        imageUrl={imageUrl}
+        onNext={onNext}
+      />
+    );
+  }
 
   return (
     <div className="p-4 max-w-xl mx-auto text-center bg-gradient-to-br from-[#0f172a] to-[#1e293b] min-h-screen text-white rounded-lg shadow-xl border border-blue-900">
@@ -128,23 +156,18 @@ useEffect(() => {
     Guesses Left: <span className="text-white">{count}</span>
   </p>
 
-  {isCorrect !== null && (
-    <p className={`mt-4 text-lg font-bold transition-all duration-300 ${
-      isCorrect === null ? 'opacity-0' : 'opacity-100'
-    } ${
-      isCorrect
-        ? 'text-green-400'
-        : 'text-red-400 animate-shake bg-red-900/20 border border-red-500 px-4 py-2 rounded shadow-md'
-    }`}>
-      {isCorrect ? "✅ Correct!" : "❌ Wrong Guess!"}
-    </p>
-  )}
+  {isCorrect === false && (
+    <p className="mt-4 text-lg font-semibold text-red-400"> wrong guess ! lmfao </p>)
+  } 
 
   {count === 0 && !isCorrect && (
     <p className="mt-4 text-lg font-semibold text-red-400">
       🛑 Game Over! The correct answer was: <span className="underline text-white">{correctAnswer}</span>
     </p>
   )}
+  {
+    guess
+  }
 </div>
   );
 }

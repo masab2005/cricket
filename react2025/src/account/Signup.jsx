@@ -1,19 +1,22 @@
 import React, { use } from 'react';
 import { login as authLogin, updateUserData } from '../store/authSlice'
 import { Link,useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import authService from '../appwrite/auth' 
 import conf from '../appwrite/conf';
 import { useDispatch, useSelector } from 'react-redux';
+import LoadingSpinner from '../LoadingSpinner.jsx';
 
 function Signup() {
     const { register, handleSubmit, watch } = useForm();
     const navigate = useNavigate();
     const [error, setError] = React.useState("");
     const dispatch = useDispatch();
+    const [loading, setLoading] = React.useState(false);
 
     const create = async(data) => {
         setError("")
+        setLoading(true);
         try{
         const session = await authService.createAccount(data);
         if(session){
@@ -27,8 +30,11 @@ function Signup() {
         }
     } catch(error) {
         setError(error.message);
+    }finally {
+        setLoading(false);
     }
 }
+    if(loading) return <LoadingSpinner/>
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div className="sm:mx-auto sm:w-full sm:max-w-md">

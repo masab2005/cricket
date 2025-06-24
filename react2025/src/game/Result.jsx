@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import service from '../appwrite/conf.js';
 import { updateUserData } from '../store/authSlice.js';
 import { useSelector, useDispatch } from 'react-redux';
+import LogOutBtn from '../account/LogOutBtn.jsx';
 
 function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
     }
 
     // Only update score if the answer was correct
-    if (isCorrect && userData?.$id) {
+    if (userData?.$id) {
       updateUserScoreAndIndex();
     }
   }, []);
@@ -68,6 +69,7 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
           🔁 Next Player
         </button>
       </div>
+      <LogOutBtn/>
     </div>
   );
 }

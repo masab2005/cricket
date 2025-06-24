@@ -6,17 +6,21 @@ import authService from '../appwrite/auth'
 import { useDispatch } from 'react-redux';
 import service from '../appwrite/conf.js';
 import { updateUserData } from '../store/authSlice.js';
+import LoadingSpinner from '../LoadingSpinner.jsx';
 function Login(){
 
   const { register, handleSubmit  } = useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   const login = async (data) =>{
     setError("");
+    setLoading(true);
     try{
         const { email, password } = data;
+        //await authService.logout();
         const session = await authService.login(email, password);
 
         if(session){
@@ -30,9 +34,11 @@ function Login(){
         }
     } catch(error){
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }  
-
+  if(loading) return <LoadingSpinner/>
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">

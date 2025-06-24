@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import service from '../appwrite/conf.js';
 import Result from './Result.jsx';
 import { useSelector } from 'react-redux';
-
+import LogOutBtn from '../account/LogOutBtn.jsx';
+import LoadingSpinner from '../LoadingSpinner.jsx';
 const hintLabels = [
   "Country",
   "Role",
@@ -25,6 +26,7 @@ function Game({onNext}) {
   const [ hintValues,setHintValues ] = useState([])
   const [count,setCount] = useState(6);
   const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(true);
   const maxScore = 100;
   const scorePerHint = 10;
   const currentScore = maxScore - revealedHints.length * scorePerHint;
@@ -47,6 +49,8 @@ useEffect(() => {
       }
     } catch (error) {
       console.error("Error fetching player data:", error);
+    } finally{
+      setLoading(false);
     }
   }
 
@@ -89,7 +93,7 @@ useEffect(() => {
   }
   }
 }, [isCorrect]);
-
+  if (loading) return <LoadingSpinner/>
   if (isCorrect === true) {
     return (
       <Result
@@ -165,15 +169,7 @@ useEffect(() => {
   {isCorrect === false && (
     <p className="mt-4 text-lg font-semibold text-red-400"> wrong guess ! lmfao </p>)
   } 
-
-  {count === 0 && !isCorrect && (
-    <p className="mt-4 text-lg font-semibold text-red-400">
-      🛑 Game Over! The correct answer was: <span className="underline text-white">{correctAnswer}</span>
-    </p>
-  )}
-  {
-    guess
-  }
+    <LogOutBtn />
 </div>
   );
 }

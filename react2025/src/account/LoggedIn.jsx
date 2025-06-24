@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login, logout, updateUserData } from '../store/authSlice';
 import service from '../appwrite/conf';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../LoadingSpinner';
 
 function LoggedIN() {
   const navigate = useNavigate();
@@ -14,12 +15,12 @@ function LoggedIN() {
   useEffect(() => {
   const fetchUser = async () => {
     
-    if (!document.cookie.includes('a_session')) {
-      console.log("No session cookie found. Skipping getCurrentUser.");
-      dispatch(logout());
-      setLoading(false);
-      return;
-    }
+    // if (!document.cookie.includes('a_session')) {
+    //   console.log("No session cookie found. Skipping getCurrentUser.");
+    //   dispatch(logout());
+    //   setLoading(false);
+    //   return;
+    // }
 
     try {
       const user = await authService.getCurrentUser();
@@ -41,7 +42,7 @@ function LoggedIN() {
 
   fetchUser();
 }, [dispatch]);
-
+  
   useEffect(() => {
     if (!loading) {
       if (isLoggedIn) {
@@ -52,6 +53,8 @@ function LoggedIN() {
     }
   }, [isLoggedIn, loading, navigate]);
 
+  if(loading) return <LoadingSpinner/>
+  
   return null;
 }
 

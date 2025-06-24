@@ -32,8 +32,10 @@ function Game({onNext}) {
 useEffect(() => {
   async function fetchPlayer() {
     try {
-      console.log("Fetching player data for index:", userGameData);
-      console.log("user data", userData);
+      console.log("Fetching player data for index:", userGameData?.currentIndex);
+      if (userGameData?.currentIndex === undefined) return;
+      
+
       const player = await service.getPlayer(userGameData.currentIndex); 
       if (player) {
         setHintValues(player.hints);
@@ -47,8 +49,12 @@ useEffect(() => {
       console.error("Error fetching player data:", error);
     }
   }
-  fetchPlayer();
+
+  if (userGameData && userGameData.currentIndex !== undefined) {
+    fetchPlayer();
+  }
 }, []);
+
   
 
   const handleRevealHint = (index) => {

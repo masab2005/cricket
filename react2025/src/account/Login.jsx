@@ -16,9 +16,11 @@ function Login(){
   const login = async (data) =>{
     setError("");
     try{
-       const session = await authService.login(data);
+        const { email, password } = data;
+        const session = await authService.login(email, password);
+
         if(session){
-          const userData = authService.getCurrentUser();
+          const userData = await authService.getCurrentUser();
           if(userData){ 
                dispatch(authLogin({ userData : userData }));
                const gameData =  await service.getUserInfo(userData.$id);

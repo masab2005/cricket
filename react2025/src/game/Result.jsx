@@ -2,32 +2,34 @@ import React, { useEffect } from 'react';
 import service from '../appwrite/conf.js';
 import { updateUserData } from '../store/authSlice.js';
 import { useSelector, useDispatch } from 'react-redux';
-import LogOutBtn from '../account/LogOutBtn.jsx';
+import Nav from '../navBar/Nav.jsx';
 
 function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);
   const userGameData = useSelector((state) => state.auth.userGameData);
-
+  const existingScore = userGameData?.score || 0;
   const currentIndex = (userGameData?.currentIndex || 0) + 1;
 
   useEffect(() => {
     async function updateUserScoreAndIndex() {
       try {
-        const updatedUser = await service.updateUserScore(userData.$id, currentScore, currentIndex);
+        
+        const updatedUser = await service.updateUserScore(userData.$id,existingScore, currentScore, currentIndex);
         dispatch(updateUserData({ userGameData: updatedUser }));
       } catch (error) {
         console.error('Error updating user data:', error);
       }
     }
 
-    // Only update score if the answer was correct
     if (userData?.$id) {
       updateUserScoreAndIndex();
     }
   }, []);
 
   return (
+    <>
+    <Nav/>
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-slate-800 text-white p-6">
       <div className="bg-slate-900 rounded-2xl shadow-2xl p-6 md:p-10 max-w-lg w-full border border-slate-700 text-center">
         <div className={`text-2xl font-bold mb-6 transition-all duration-500 ${
@@ -53,11 +55,10 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
               {correctAnswer}
             </span>
           </p>
-
           <p>
-            <span className="text-gray-300">Your Score:</span>{' '}
+            <span className="text-gray-300">Your Total Score:</span>{' '}
             <span className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-500'}`}>
-              {isCorrect ? currentScore : 0}
+              {existingScore}
             </span>
           </p>
         </div>
@@ -69,8 +70,8 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
           🔁 Next Player
         </button>
       </div>
-      <LogOutBtn/>
     </div>
+    </>
   );
 }
 

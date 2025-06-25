@@ -51,6 +51,8 @@ class AuthService {
       console.error("AuthService :: logout error", error);
     }
   }
+
+
 }
 
 const authService = new AuthService();

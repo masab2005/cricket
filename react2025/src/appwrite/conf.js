@@ -61,13 +61,13 @@ export class Service{
     }
   }
 
-  async updateUserScore($id, score, currentIndex) {
+  async updateUserScore($id,existingScore, currentScore, currentIndex) {
     try {
       const user = await this.databases.updateDocument(
         config.appwriteDatabaseId,
         config.appwriteUserCollectionId,
         $id,
-        { score: score, currentIndex: currentIndex }      
+        { score: (existingScore+currentScore), currentIndex: currentIndex }      
       );
       return user;
     } catch (error) {
@@ -75,7 +75,25 @@ export class Service{
       return null;
     }
   }
+
+  async getTopUsers() {
+  try {
+    const response = await this.databases.listDocuments(
+      config.appwriteDatabaseId,
+      config.appwriteUserCollectionId,
+      [
+        Query.orderDesc("score"),  // Highest scores first
+        Query.limit(3)             // Top 3 users only
+      ]
+    );
+    return response; 
+  } catch (error) {
+    console.error("Error fetching top users:", error);
+    return [];
+  }
 }
+}
+
 
   
 const service = new Service();

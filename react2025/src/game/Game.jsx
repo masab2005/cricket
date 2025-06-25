@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import service from '../appwrite/conf.js';
 import Result from './Result.jsx';
 import { useSelector } from 'react-redux';
-import LogOutBtn from '../account/LogOutBtn.jsx';
 import LoadingSpinner from '../LoadingSpinner.jsx';
+import Nav from '../navBar/Nav.jsx';
+import End from './End.jsx';
+import { useNavigate } from 'react-router-dom';
 const hintLabels = [
   "Country",
   "Role",
@@ -19,14 +21,15 @@ const hintLabels = [
 function Game({onNext}) {
   const userGameData = useSelector((state) => state.auth.userGameData);
   const userData = useSelector((state) => state.auth.userData);
-  const [ correctAnswer,setCorrectAnswer ] = useState("")
+  const [correctAnswer,setCorrectAnswer ] = useState("")
   const [revealedHints, setRevealedHints] = useState([]);
   const [guess, setGuess] = useState('');
   const [isCorrect, setIsCorrect] = useState(null);
   const [ hintValues,setHintValues ] = useState([])
   const [count,setCount] = useState(6);
   const [imageUrl, setImageUrl] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const maxScore = 100;
   const scorePerHint = 10;
   const currentScore = maxScore - revealedHints.length * scorePerHint;
@@ -34,6 +37,7 @@ function Game({onNext}) {
 useEffect(() => {
   async function fetchPlayer() {
     try {
+      setLoading(true);
       console.log("Fetching player data for index:", userGameData?.currentIndex);
       if (userGameData?.currentIndex === undefined) return;
       
@@ -45,6 +49,8 @@ useEffect(() => {
         setImageUrl(service.getFilePreview(player.imageID));
         console.log("Fetched correct answer:", player.playerName);
       } else {
+        setLoading(false)
+        navigate('/end');
         console.log("Player not found");
       }
     } catch (error) {
@@ -110,7 +116,7 @@ useEffect(() => {
       <Result
         isCorrect={false}
         correctAnswer={correctAnswer}
-        currentScore={currentScore}
+        currentScore={0}
         imageUrl={imageUrl}
         onNext={onNext}
       />
@@ -118,6 +124,8 @@ useEffect(() => {
   }
 
   return (
+    <>
+    <Nav/>
     <div className="p-4 max-w-xl mx-auto text-center bg-gradient-to-br from-[#0f172a] to-[#1e293b] min-h-screen text-white rounded-lg shadow-xl border border-blue-900">
   <h1 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-wider text-yellow-400 animate-pulse">🏏 Guess the Cricketer!</h1>
   
@@ -169,8 +177,8 @@ useEffect(() => {
   {isCorrect === false && (
     <p className="mt-4 text-lg font-semibold text-red-400"> wrong guess ! lmfao </p>)
   } 
-    <LogOutBtn />
 </div>
+</>
   );
 }
 

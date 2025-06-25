@@ -126,59 +126,97 @@ useEffect(() => {
   return (
     <>
     <Nav/>
-    <div className="p-4 max-w-xl mx-auto text-center bg-gradient-to-br from-[#0f172a] to-[#1e293b] min-h-screen text-white rounded-lg shadow-xl border border-blue-900">
-  <h1 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-wider text-yellow-400 animate-pulse">🏏 Guess the Cricketer!</h1>
-  
-  <p className="mb-4 text-lg">
-    Score: <span className="font-bold text-green-400">{currentScore}</span>
-  </p>
-
-  {/* Hint Buttons or Values */}
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-    {hintLabels.map((label, index) => (
-      <div key={index}>
-        {!revealedHints.includes(index) ? (
-          <button
-            onClick={() => handleRevealHint(index)}
-            className="w-full py-2 px-3 text-sm bg-blue-700 hover:bg-blue-600 active:scale-95 transition-transform rounded-lg shadow-md hover:shadow-blue-500/50"
-          >
-            {label}
-          </button>
-        ) : (
-          <div className="w-full py-2 px-3 text-sm bg-green-200 text-black rounded-lg border border-green-500 shadow-inner">
-            {hintValues[index]}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-6 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header with Score and Attempts */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="bg-gray-800 border-l-4 border-blue-500 pl-4 pr-6 py-3 rounded-r-lg shadow-lg">
+            <p className="text-gray-400 text-xs uppercase tracking-wide">Current Score</p>
+            <p className="text-blue-400 text-2xl font-bold">{currentScore}</p>
           </div>
-        )}
+          
+          <div className="bg-gray-800 border-r-4 border-yellow-500 pl-6 pr-4 py-3 rounded-l-lg shadow-lg text-right">
+            <p className="text-gray-400 text-xs uppercase tracking-wide">Guesses Left</p>
+            <p className="text-yellow-400 text-2xl font-bold">{count}</p>
+          </div>
+        </div>
+        
+        {/* Main Game Container */}
+        <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden">
+          {/* Title Bar */}
+          <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-6 py-4 border-b border-gray-700">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              CRICKET <span className="text-yellow-400">MASTER</span>
+            </h1>
+            <p className="text-blue-300 text-sm">Guess the player to earn points</p>
+          </div>
+          
+          {/* Hints Section */}
+          <div className="p-6 border-b border-gray-700">
+            <h2 className="flex items-center text-lg font-bold text-white mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              PLAYER HINTS
+            </h2>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {hintLabels.map((label, index) => (
+                <div key={index} className="relative">
+                  {!revealedHints.includes(index) ? (
+                    <button
+                      onClick={() => handleRevealHint(index)}
+                      className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 border-l-4 border-blue-500 text-left text-white font-medium rounded-r-md shadow-md transition-colors duration-200"
+                    >
+                      <span className="block">{label}</span>
+                      <span className="text-xs block mt-1 text-red-400">-{scorePerHint} pts</span>
+                    </button>
+                  ) : (
+                    <div className="w-full h-full py-3 px-4 bg-gray-700 border-l-4 border-green-500 rounded-r-md shadow-md">
+                      <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">{label}</div>
+                      <div className="font-semibold text-green-400">{hintValues[index]}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Input Section */}
+          <div className="p-6">
+            <form onSubmit={handleGuessSubmit}>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter player name..."
+                  value={guess}
+                  onChange={(e) => setGuess(e.target.value)}
+                  className="w-full px-5 py-4 bg-gray-900 border-2 border-gray-700 focus:border-blue-500 text-white rounded-lg focus:outline-none shadow-inner"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-md shadow-md transition-colors"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+            
+            {isCorrect === false && (
+              <div className="mt-4 bg-red-900/50 border-l-4 border-red-500 rounded-r-md p-4">
+                <p className="text-red-400 font-semibold">Incorrect guess. Try again!</p>
+              </div>
+            )}
+          </div>
+          
+          {/* Footer */}
+          <div className="py-4 px-6 bg-gray-900 border-t border-gray-700 text-center">
+            <p className="text-gray-400 text-sm">Each hint reduces your potential score by {scorePerHint} points</p>
+          </div>
+        </div>
       </div>
-    ))}
-  </div>
-
-  {/* Input + Submit */}
-  <form onSubmit={handleGuessSubmit} className="space-y-4">
-    <input
-      type="text"
-      placeholder="e.g: Babar Azam"
-      value={guess}
-      onChange={(e) => setGuess(e.target.value)}
-      className="w-full px-4 py-2 border-2 border-yellow-500 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder:text-gray-400"
-    />
-    <button
-      type="submit"
-      className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-600 active:scale-95 transition duration-150 ease-in-out shadow-lg"
-    >
-      🎯 Submit Guess
-    </button>
-  </form>
-
-  <p className="mt-4 text-md font-semibold text-yellow-300">
-    Guesses Left: <span className="text-white">{count}</span>
-  </p>
-
-  {isCorrect === false && (
-    <p className="mt-4 text-lg font-semibold text-red-400"> wrong guess ! lmfao </p>)
-  } 
-</div>
-</>
+    </div>
+    </>
   );
 }
 

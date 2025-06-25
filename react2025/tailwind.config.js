@@ -7,15 +7,15 @@ export default {
   ],
   theme: {
     extend: {
-      animation: {
-        shake: 'shake 0.4s ease-in-out',
-      },
       keyframes: {
-        shake: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '25%': { transform: 'translateX(-6px)' },
-          '75%': { transform: 'translateX(6px)' },
+        spinCustom: {
+          '0%': { transform: 'rotate(0)' },
+          '50%': { transform: 'rotate(3.1415rad)' },
+          '100%': { transform: 'rotate(720deg)' },
         },
+      },
+      animation: {
+        spinCustom: 'spinCustom 1s linear infinite',
       },
     },
   },

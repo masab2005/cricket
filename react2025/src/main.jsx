@@ -12,14 +12,14 @@ import {store,persistor} from './store/store.js'
 import './index.css'
 import GameWrapper from './game/GameWrapper.jsx'
 import { PersistGate } from 'redux-persist/integration/react'
- 
+import ProtectedRoute from './account/ProtectedRoute.jsx'
 const routers = createBrowserRouter([
   { path: '/', element: <App /> },
   { path: '/login', element: <Login /> },
   { path: '/signup', element: <Signup /> },
-  { path: '/game', element: <GameWrapper /> },
-  { path: '/leaderboard', element: <Leaderboard /> },
-  { path: '/end', element: <End/>}
+  { path: '/game', element: <ProtectedRoute><GameWrapper /></ProtectedRoute> },
+  { path: '/leaderboard', element: <ProtectedRoute><Leaderboard /></ProtectedRoute> },
+  { path: '/end', element: <ProtectedRoute><End/></ProtectedRoute>}
 ]);
 
 createRoot(document.getElementById('root')).render(

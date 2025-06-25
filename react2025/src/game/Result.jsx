@@ -30,45 +30,81 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
   return (
     <>
     <Nav/>
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-slate-800 text-white p-6">
-      <div className="bg-slate-900 rounded-2xl shadow-2xl p-6 md:p-10 max-w-lg w-full border border-slate-700 text-center">
-        <div className={`text-2xl font-bold mb-6 transition-all duration-500 ${
-          isCorrect ? 'text-green-400' : 'text-red-500'
+    <div className="min-h-screen bg-gray-900 py-8 px-4 flex items-center justify-center">
+      <div className="max-w-md w-full bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700">
+        {/* Result Header */}
+        <div className={`py-6 px-8 text-center ${
+          isCorrect 
+            ? 'bg-green-800' 
+            : 'bg-red-800'
         }`}>
-          {isCorrect ? '🏏 You guessed it right!' : 'Wrong guess! Try next player.'}
+          <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+            isCorrect 
+              ? 'bg-green-700 text-green-200' 
+              : 'bg-red-700 text-red-200'
+          }`}>
+            {isCorrect ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+          </div>
+          <h2 className="text-2xl font-bold text-white">
+            {isCorrect ? 'Correct Answer!' : 'Not Quite Right'}
+          </h2>
         </div>
 
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="Player"
-            className="w-48 h-48 object-cover rounded-full mx-auto border-4 border-yellow-500 shadow-lg mb-6"
-          />
-        ) : (
-          <p className="text-sm text-gray-400 mb-6">Loading image...</p>
-        )}
-
-        <div className="space-y-4 text-lg">
-          <p>
-            <span className="text-gray-300">Correct Answer:</span>{' '}
-            <span className="text-white font-semibold underline underline-offset-4">
-              {correctAnswer}
-            </span>
-          </p>
-          <p>
-            <span className="text-gray-300">Your Total Score:</span>{' '}
-            <span className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-500'}`}>
-              {existingScore}
-            </span>
-          </p>
+        {/* Player Image */}
+        <div className="px-8 py-6 bg-gray-700 flex justify-center">
+          {imageUrl ? (
+            <div className="relative">
+              <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-gray-600">
+                <img 
+                  src={imageUrl} 
+                  alt="Player"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="w-36 h-36 rounded-full bg-gray-600 flex items-center justify-center">
+              <p className="text-gray-400">No image</p>
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={onNext}
-          className="mt-8 px-6 py-3 bg-yellow-400 text-slate-900 font-semibold rounded-full shadow-lg hover:bg-yellow-300 active:scale-95 transition-transform duration-200"
-        >
-          🔁 Next Player
-        </button>
+        {/* Result Details */}
+        <div className="px-8 py-6 bg-gray-800">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-700">
+              <span className="text-gray-300">Correct Answer:</span>
+              <span className="text-lg font-bold text-yellow-400">{correctAnswer}</span>
+            </div>
+
+            <div className="flex justify-between items-center pb-3 border-b border-gray-700">
+              <span className="text-gray-300">Points Earned:</span>
+              <span className={`text-lg font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                {isCorrect ? `+${currentScore}` : '0'}
+              </span>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Total Score:</span>
+              <span className="text-lg font-bold text-white">{existingScore}</span>
+            </div>
+          </div>
+          
+          <button 
+            onClick={onNext}
+            className="w-full mt-8 py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg transition-colors"
+          >
+            Next Player
+          </button>
+        </div>
       </div>
     </div>
     </>

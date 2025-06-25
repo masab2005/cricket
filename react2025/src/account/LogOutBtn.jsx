@@ -17,7 +17,7 @@ function LogOutBtn() {
   return (
     <button
       onClick={handleLogout}
-      className="text-red-400 hover:text-red-300 font-medium transition duration-200"
+      className="w-full py-3 px-6 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg shadow-lg flex items-center justify-center gap-2 transition-colors"
     >
       Logout
     </button>

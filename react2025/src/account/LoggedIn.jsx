@@ -13,47 +13,43 @@ function LoggedIN() {
   const isLoggedIn = useSelector((state) => state.auth.status);
 
   useEffect(() => {
-  const fetchUser = async () => {
-    
-    // if (!document.cookie.includes('a_session')) {
-    //   console.log("No session cookie found. Skipping getCurrentUser.");
-    //   dispatch(logout());
-    //   setLoading(false);
-    //   return;
-    // }
-
-    try {
-      const user = await authService.getCurrentUser();
-      if (user) {
-        console.log("Session found. Dispatching login...");
-        dispatch(login({ userData: user }));
-        const gameData = await service.getUserInfo(user.$id);
-        dispatch(updateUserData({ userGameData: gameData }));
-      } else {
+    const checkAuthAndNavigate = async () => {
+      setLoading(true);
+      
+      try {
+        const user = await authService.getCurrentUser();
+        
+        if (user) {
+          console.log("Session found. Dispatching login...");
+          dispatch(login({ userData: user }));
+          
+          try {
+            const gameData = await service.getUserInfo(user.$id);
+            dispatch(updateUserData({ userGameData: gameData }));
+          } catch (gameDataError) {
+            console.error("Error fetching game data:", gameDataError);
+          }
+          
+          setLoading(false);
+          navigate('/game');
+        } else {
+          // User is not authenticated
+          dispatch(logout());
+          setLoading(false);
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error("Login check failed:", error);
         dispatch(logout());
-      }
-    } catch (error) {
-      console.error("Login check failed:", error);
-      dispatch(logout());
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchUser();
-}, [dispatch]);
-  
-  useEffect(() => {
-    if (!loading) {
-      if (isLoggedIn) {
-        navigate('/game');
-      } else {
+        setLoading(false);
         navigate('/login');
       }
-    }
-  }, [isLoggedIn, loading, navigate]);
-
-  if(loading) return <LoadingSpinner/>
+    };
+    checkAuthAndNavigate();
+    
+  }, [dispatch]);
+  
+  if (loading) return <LoadingSpinner />;
   
   return null;
 }

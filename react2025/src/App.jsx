@@ -9,7 +9,6 @@ import Leaderboard from './navBar/Leaderboard'
 function App() {
   return (
       <LoggedIN />
-  
   )
 }
 

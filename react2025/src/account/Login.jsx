@@ -68,32 +68,35 @@ function Login(){
   }  
   if(loading) return <LoadingSpinner/>
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
             <svg xmlns="" className="h-10 w-10 text-white" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.35-.035-.691-.1-1.02A5 5 0 0010 11z" clipRule="evenodd" />
             </svg>
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-white">
+        <h2 className="mt-6 text-center text-3xl font-bold text-white tracking-tight">
           Sign in to your account
         </h2>
       </div>
         
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-700">
+        <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden py-8 px-4 sm:px-10">
           {error && (
-            <div className="mb-4 bg-red-900/50 border-l-4 border-red-500 p-4 rounded-r-md">
-              <p className="text-red-400">{error}</p>
+            <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <p className="text-red-400">{error}</p>
+              </div>
             </div>
           )}
           <form onSubmit={handleSubmit(login)}>
-
-            
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300">
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -102,7 +105,7 @@ function Login(){
                   name="email"
                   type="email"
                   placeholder="user@example.com"
-                  className={`appearance-none block w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-600'} bg-gray-700 rounded-md placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-slate-600/50'} bg-slate-700/50 rounded-xl placeholder-slate-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/70 transition-colors sm:text-sm`}
                   {...register('email', { 
                     required: "Email is required",
                     validate: {
@@ -113,7 +116,7 @@ function Login(){
                 />
                 {errors.email && (
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path>
                     </svg>
                   </div>
@@ -125,22 +128,24 @@ function Login(){
             </div>
             
             <div className="mt-6">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                Password
-              </label>
+              <div className="flex justify-between items-center">
+                <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                  Password
+                </label>
+              </div>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <input
                   id="password"
                   name="password"
                   type="password"
-                  className={`appearance-none block w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-600'} bg-gray-700 rounded-md placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full px-4 py-3 border ${errors.password ? 'border-red-500' : 'border-slate-600/50'} bg-slate-700/50 rounded-xl placeholder-slate-400 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/70 transition-colors sm:text-sm`}
                   {...register('password', { 
                     required: "Password is required" 
                   })}
                 />
                 {errors.password && (
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path>
                     </svg>
                   </div>
@@ -151,25 +156,25 @@ function Login(){
               )}
             </div>
             
-            <div className="mt-6">
-              <span className="block w-full rounded-md shadow-sm">
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading}
-                >
-                  {loading ? "Signing in..." : "Sign in"}
-                </button>
-              </span>
+            <div className="mt-8">
+              <button
+                type="submit"
+                className="w-full flex justify-center py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-slate-800"
+                disabled={loading}
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </button>
             </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-400">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-400 hover:text-blue-300">
-              Sign up
-            </Link>
-          </p>
+          <div className="mt-8 pt-6 border-t border-slate-700/50">
+            <p className="text-center text-sm text-slate-400">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

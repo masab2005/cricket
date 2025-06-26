@@ -4,7 +4,6 @@ import Result from './Result.jsx';
 import { useSelector } from 'react-redux';
 import LoadingSpinner from '../LoadingSpinner.jsx';
 import Nav from '../navBar/Nav.jsx';
-import End from './End.jsx';
 import { useNavigate } from 'react-router-dom';
 const hintLabels = [
   "Country",
@@ -34,6 +33,19 @@ function Game({onNext}) {
   const scorePerHint = 10;
   const currentScore = maxScore - revealedHints.length * scorePerHint;
 
+  // Save game state to localStorage when component unmounts or state changes
+  useEffect(() => {
+    // Only save if we have a valid game in progress
+    if (userGameData?.currentIndex !== undefined && correctAnswer) {
+      const gameState = {
+        revealedHints,
+        count,
+        playerIndex: userGameData.currentIndex
+      };
+      localStorage.setItem('gameState', JSON.stringify(gameState));
+    }
+  }, [revealedHints, count, userGameData?.currentIndex, correctAnswer]);
+
 useEffect(() => {
   async function fetchPlayer() {
     try {
@@ -41,17 +53,27 @@ useEffect(() => {
       console.log("Fetching player data for index:", userGameData?.currentIndex);
       if (userGameData?.currentIndex === undefined) return;
       
-
       const player = await service.getPlayer(userGameData.currentIndex); 
       if (player) {
         setHintValues(player.hints);
         setCorrectAnswer(player.playerName);
         setImageUrl(service.getFilePreview(player.imageID));
         console.log("Fetched correct answer:", player.playerName);
+        const savedState = localStorage.getItem('gameState');
+        if (savedState) {
+          const parsedState = JSON.parse(savedState);
+          if (parsedState.playerIndex === userGameData.currentIndex) {
+            setRevealedHints(parsedState.revealedHints || []);
+            setCount(parsedState.count || 6);
+          } else {
+            localStorage.removeItem('gameState');
+          }
+        }
       } else {
         setLoading(false)
+        localStorage.removeItem('gameState');
         navigate('/end');
-        console.log("Player not found");
+        console.log("Player not found"); 
       }
     } catch (error) {
       console.error("Error fetching player data:", error);
@@ -74,21 +96,35 @@ useEffect(() => {
   };
 
   const handleGuessSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const normalizedGuess = guess.trim().toLowerCase();
-  const normalizedAnswer = correctAnswer.trim().toLowerCase();
+    const normalizedGuess = guess.trim().toLowerCase();
+    const normalizedAnswer = correctAnswer.trim().toLowerCase();
 
-  setIsCorrect(normalizedGuess === normalizedAnswer);
+    // Prevent empty input from being accepted as correct
+    let isCorrect = false;
+    if (normalizedGuess.length > 0) {
+      const answerWords = normalizedAnswer.split(/\s+/);
+      const isWordMatch = answerWords.some(word => word === normalizedGuess);
+      const isSubstringMatch = normalizedAnswer.includes(normalizedGuess);
 
-  if (guess !== "") setCount(prev => prev - 1);
-  setGuess("");
-};
+      isCorrect =
+        normalizedGuess === normalizedAnswer ||
+        isWordMatch ||
+        isSubstringMatch;
+    }
+
+    setIsCorrect(isCorrect);
+
+    if (guess !== "") setCount(prev => prev - 1);
+    setGuess("");
+  };
 
   useEffect(() => {
   if (isCorrect !== null) {
     if(isCorrect === true) {
       setIsCorrect(true);
+      localStorage.removeItem('gameState');
     }
     else{
     const timer = setTimeout(() => {
@@ -99,8 +135,11 @@ useEffect(() => {
   }
   }
 }, [isCorrect]);
+
   if (loading) return <LoadingSpinner/>
   if (isCorrect === true) {
+    // Clear localStorage when game is completed
+    localStorage.removeItem('gameState');
     return (
       <Result
     isCorrect={true}
@@ -112,6 +151,8 @@ useEffect(() => {
     );
   }
   if (count === 0 && !isCorrect) {
+    // Clear localStorage when game is completed
+    localStorage.removeItem('gameState');
     return (
       <Result
         isCorrect={false}
@@ -126,55 +167,79 @@ useEffect(() => {
   return (
     <>
     <Nav/>
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-6 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header with Score and Attempts */}
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8 px-4 sm:px-6">
+      <div className="max-w-3xl mx-auto">
+        {/* Game Header with Score and Attempts */}
         <div className="flex justify-between items-center mb-8">
-          <div className="bg-gray-800 border-l-4 border-blue-500 pl-4 pr-6 py-3 rounded-r-lg shadow-lg">
-            <p className="text-gray-400 text-xs uppercase tracking-wide">Current Score</p>
-            <p className="text-blue-400 text-2xl font-bold">{currentScore}</p>
+          <div className="bg-slate-800/70 backdrop-blur-sm border border-slate-700/50 pl-5 pr-7 py-4 rounded-xl shadow-lg">
+            <p className="text-slate-400 text-xs uppercase tracking-wider font-medium">Current Score</p>
+            <div className="flex items-baseline">
+              <span className="text-cyan-400 text-3xl font-bold">{currentScore}</span>
+              <span className="text-slate-500 ml-1 text-sm">pts</span>
+            </div>
           </div>
           
-          <div className="bg-gray-800 border-r-4 border-yellow-500 pl-6 pr-4 py-3 rounded-l-lg shadow-lg text-right">
-            <p className="text-gray-400 text-xs uppercase tracking-wide">Guesses Left</p>
-            <p className="text-yellow-400 text-2xl font-bold">{count}</p>
+          <div className="bg-slate-800/70 backdrop-blur-sm border border-slate-700/50 pl-7 pr-5 py-4 rounded-xl shadow-lg text-right">
+            <p className="text-slate-400 text-xs uppercase tracking-wider font-medium">Guesses Left</p>
+            <div className="flex items-baseline justify-end">
+              <span className="text-amber-400 text-3xl font-bold">{count}</span>
+              <span className="text-slate-500 ml-1 text-sm">/ 6</span>
+            </div>
           </div>
         </div>
         
         {/* Main Game Container */}
-        <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-2xl overflow-hidden">
+        <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden">
           {/* Title Bar */}
-          <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-6 py-4 border-b border-gray-700">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-              CRICKET <span className="text-yellow-400">MASTER</span>
-            </h1>
-            <p className="text-blue-300 text-sm">Guess the player to earn points</p>
+          <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-6 border-b border-slate-700/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  CRICKET <span className="text-amber-400 font-extrabold">MASTER</span>
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">Guess the player to earn points</p>
+              </div>
+              <div className="hidden sm:block">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Hints Section */}
-          <div className="p-6 border-b border-gray-700">
-            <h2 className="flex items-center text-lg font-bold text-white mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+          <div className="p-6 md:p-8 border-b border-slate-700/50">
+            <h2 className="flex items-center text-lg font-bold text-white mb-5">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
               PLAYER HINTS
             </h2>
             
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {hintLabels.map((label, index) => (
                 <div key={index} className="relative">
                   {!revealedHints.includes(index) ? (
                     <button
                       onClick={() => handleRevealHint(index)}
-                      className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 border-l-4 border-blue-500 text-left text-white font-medium rounded-r-md shadow-md transition-colors duration-200"
+                      className="w-full py-4 px-5 bg-slate-700/50 hover:bg-slate-700/80 border border-slate-600/50 hover:border-cyan-500/50 text-left text-white font-medium rounded-xl shadow-md transition-all duration-200 group"
                     >
-                      <span className="block">{label}</span>
-                      <span className="text-xs block mt-1 text-red-400">-{scorePerHint} pts</span>
+                      <span className="block text-sm">{label}</span>
+                      <div className="flex items-center mt-1.5">
+                        <span className="text-xs text-red-400 font-medium">-{scorePerHint} pts</span>
+                        <span className="ml-auto text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                        </span>
+                      </div>
                     </button>
                   ) : (
-                    <div className="w-full h-full py-3 px-4 bg-gray-700 border-l-4 border-green-500 rounded-r-md shadow-md">
-                      <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">{label}</div>
-                      <div className="font-semibold text-green-400">{hintValues[index]}</div>
+                    <div className="w-full h-full py-4 px-5 bg-slate-700/70 border border-emerald-500/30 rounded-xl shadow-md">
+                      <div className="text-xs uppercase tracking-wider text-slate-400 mb-1">{label}</div>
+                      <div className="font-semibold text-emerald-400">{hintValues[index]}</div>
                     </div>
                   )}
                 </div>
@@ -183,7 +248,7 @@ useEffect(() => {
           </div>
           
           {/* Input Section */}
-          <div className="p-6">
+          <div className="p-6 md:p-8">
             <form onSubmit={handleGuessSubmit}>
               <div className="relative">
                 <input
@@ -191,11 +256,11 @@ useEffect(() => {
                   placeholder="Enter player name..."
                   value={guess}
                   onChange={(e) => setGuess(e.target.value)}
-                  className="w-full px-5 py-4 bg-gray-900 border-2 border-gray-700 focus:border-blue-500 text-white rounded-lg focus:outline-none shadow-inner"
+                  className="w-full px-5 py-4 bg-slate-900/70 border border-slate-700/70 focus:border-cyan-500/70 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/30 shadow-inner placeholder-slate-500 text-lg"
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-md shadow-md transition-colors"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-lg transition-all duration-200"
                 >
                   Submit
                 </button>
@@ -203,16 +268,31 @@ useEffect(() => {
             </form>
             
             {isCorrect === false && (
-              <div className="mt-4 bg-red-900/50 border-l-4 border-red-500 rounded-r-md p-4">
-                <p className="text-red-400 font-semibold">Incorrect guess. Try again!</p>
+              <div className="mt-5 bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
+                <div className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-red-400 font-medium">Incorrect guess. Try again!</p>
+                </div>
               </div>
             )}
           </div>
           
           {/* Footer */}
-          <div className="py-4 px-6 bg-gray-900 border-t border-gray-700 text-center">
-            <p className="text-gray-400 text-sm">Each hint reduces your potential score by {scorePerHint} points</p>
+          <div className="py-4 px-6 bg-slate-900/80 border-t border-slate-700/50 text-center backdrop-blur-sm">
+            <p className="text-slate-400 text-sm">Each hint reduces your potential score by <span className="text-amber-400 font-medium">{scorePerHint}</span> points</p>
           </div>
+        </div>
+
+        {/* Tip Card */}
+        <div className="mt-6 bg-slate-800/40 backdrop-blur-sm border border-slate-700/30 rounded-xl p-4 flex items-center">
+          <div className="bg-blue-500/20 rounded-full p-2 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <p className="text-slate-300 text-sm">Start with less valuable hints like <span className="text-cyan-400 font-medium">Country</span> or <span className="text-cyan-400 font-medium">Role</span> to maximize your score.</p>
         </div>
       </div>
     </div>

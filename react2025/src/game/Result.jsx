@@ -1,24 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import service from '../appwrite/conf.js';
 import { updateUserData } from '../store/authSlice.js';
 import { useSelector, useDispatch } from 'react-redux';
 import Nav from '../navBar/Nav.jsx';
-
+import LoadingSpinner from '../LoadingSpinner.jsx';
 function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);
   const userGameData = useSelector((state) => state.auth.userGameData);
   const existingScore = userGameData?.score || 0;
   const currentIndex = (userGameData?.currentIndex || 0) + 1;
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function updateUserScoreAndIndex() {
       try {
-        
+        setLoading(true);
         const updatedUser = await service.updateUserScore(userData.$id,existingScore, currentScore, currentIndex);
         dispatch(updateUserData({ userGameData: updatedUser }));
       } catch (error) {
         console.error('Error updating user data:', error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -26,6 +28,8 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
       updateUserScoreAndIndex();
     }
   }, []);
+
+  if(loading) return <LoadingSpinner/>
 
   return (
     <>

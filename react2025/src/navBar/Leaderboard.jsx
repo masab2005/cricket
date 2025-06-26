@@ -31,66 +31,77 @@ function Leaderboard() {
 
   // Trophy icons for top 3 players
   const trophyIcons = [
-    <div className="w-12 h-12 flex items-center justify-center bg-yellow-400 rounded-full shadow-lg">
-      <Trophy className="w-6 h-6 text-gray-900" />
+    <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg">
+      <Trophy className="w-6 h-6 text-yellow-900" />
     </div>,
-    <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full shadow-lg">
-      <Trophy className="w-6 h-6 text-gray-700" />
+    <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 rounded-full shadow-lg">
+      <Trophy className="w-6 h-6 text-slate-700" />
     </div>,
-    <div className="w-12 h-12 flex items-center justify-center bg-amber-600 rounded-full shadow-lg">
-      <Trophy className="w-6 h-6 text-amber-900" />
+    <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-amber-600 to-amber-800 rounded-full shadow-lg">
+      <Trophy className="w-6 h-6 text-amber-200" />
     </div>
   ];
 
   return (
     <>
     <Nav />
-    <div className="min-h-screen bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <Link 
           to="/game" 
-          className="inline-flex items-center mb-6 text-gray-300 hover:text-white transition-colors"
+          className="inline-flex items-center mb-6 text-slate-400 hover:text-white transition-colors group"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Game
+          <div className="mr-2 bg-slate-800/70 backdrop-blur-sm p-1.5 rounded-full border border-slate-700/50 group-hover:border-cyan-500/50 transition-colors">
+            <ArrowLeft className="w-4 h-4 text-cyan-400" />
+          </div>
+          <span>Back to Game</span>
         </Link>
         
         {/* Leaderboard Card */}
-        <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700">
+        <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="py-6 px-6 text-center border-b border-gray-700">
-            <h1 className="text-3xl font-bold text-white">
-              Leaderboard
-            </h1>
-            <p className="text-gray-400 text-sm mt-1">Top cricket masters</p>
+          <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-6 border-b border-slate-700/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  Leaderboard
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">Top cricket masters</p>
+              </div>
+              <div className="hidden sm:block">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Leaderboard List */}
-          <div className="px-6 pb-6">
+          <div className="px-6 pb-6 pt-4">
             {loading ? (
-              <div className="py-12 text-center text-gray-400">
-                <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-700 rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="py-12 text-center text-slate-400">
+                <div className="w-12 h-12 border-4 border-t-cyan-500 border-slate-700 rounded-full animate-spin mx-auto mb-4"></div>
                 <p>Loading leaderboard...</p>
               </div>
             ) : leaderboard.length === 0 ? (
-              <div className="py-12 text-center text-gray-400">
+              <div className="py-12 text-center text-slate-400">
                 <p>No players on the leaderboard yet</p>
               </div>
             ) : (
-              <div className="space-y-4 mt-6">
+              <div className="space-y-3 mt-4">
                 {leaderboard.map((user, index) => (
                   <div
                     key={index}
                     className={`flex items-center justify-between p-4 ${
                       user.$id === currentUserId 
-                        ? 'bg-blue-900/30 border-l-4 border-blue-500' 
-                        : 'bg-gray-700'
-                    } rounded-lg transition-all duration-300`}
+                        ? 'bg-blue-900/20 border border-cyan-500/30' 
+                        : 'bg-slate-700/40 border border-slate-600/30'
+                    } rounded-xl transition-all duration-300 backdrop-blur-sm`}
                   >
                     {/* Rank */}
                     <div className="flex items-center gap-4">
-                      <div className="text-2xl font-bold text-gray-300 w-6 text-center">
+                      <div className="text-xl font-bold text-slate-400 w-6 text-center">
                         {index + 1}
                       </div>
                       
@@ -102,22 +113,35 @@ function Leaderboard() {
                         <div className="font-semibold text-lg flex items-center">
                           <span className="text-white">{user.username || `Player ${index + 1}`}</span>
                           {user.$id === currentUserId && (
-                            <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">You</span>
+                            <span className="ml-2 text-xs bg-cyan-500/80 text-white px-2 py-0.5 rounded-full">You</span>
                           )}
-                        </div>
-                        <div className="text-sm text-gray-400">
-                          Player Level: {Math.floor(user.score / 100) + 1}
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Score */}
-                    <div className="text-2xl font-bold text-yellow-400">{user.score}</div>
+                    <div className="text-2xl font-bold text-amber-400 flex items-center">
+                      {user.score}
+                      <span className="text-slate-500 text-sm ml-1">pts</span>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
+          {/* Footer */}
+          <div className="py-4 px-6 bg-slate-900/80 border-t border-slate-700/50 text-center backdrop-blur-sm">
+            <p className="text-slate-400 text-sm">Keep playing to climb the ranks!</p>
+          </div>
+        </div>
+
+        {/* Tip Card */}
+        <div className="mt-6 bg-slate-800/40 backdrop-blur-sm border border-slate-700/30 rounded-xl p-4 flex items-center">
+          <div className="bg-blue-500/20 rounded-full p-2 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <p className="text-slate-300 text-sm">Scores are based on how many hints you used. Fewer hints means higher scores!</p>
         </div>
       </div>
     </div>
@@ -126,3 +150,4 @@ function Leaderboard() {
 }
 
 export default Leaderboard;
+

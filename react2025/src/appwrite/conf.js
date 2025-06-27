@@ -23,8 +23,7 @@ export class Service{
     );
     return res.documents[0] || null;
   } catch (error) {
-    console.error("Error fetching player:", error);
-    return null;
+    throw new Error("Failed to fetch player data");
   }
 }
 
@@ -43,7 +42,7 @@ export class Service{
       );
       return user;
     } catch (error) {
-      console.error("Error creating user:", error);
+      throw new Error("Failed to create user profile");
     }
   }
 
@@ -56,8 +55,7 @@ export class Service{
       );
       return user;
     } catch (error) {
-      console.error("Error fetching user:", error);
-      return null;
+      throw new Error("Failed to fetch user profile");
     }
   }
 
@@ -71,8 +69,7 @@ export class Service{
       );
       return user;
     } catch (error) {
-      console.error("Error updating user score:", error);
-      return null;
+      throw new Error("Failed to update score. Your progress may not be saved.");
     }
   }
 
@@ -88,8 +85,7 @@ export class Service{
     );
     return response; 
   } catch (error) {
-    console.error("Error fetching top users:", error);
-    return [];
+    throw new Error("Failed to fetch leaderboard data");
   }
 }
 }

@@ -54,7 +54,7 @@ function End() {
         
         {/* Footer */}
         <div className="py-4 px-6 bg-slate-900/80 border-t border-slate-700/50 text-center backdrop-blur-sm">
-          <p className="text-slate-400 text-sm">Thank you for playing Cricket Master!</p>
+          <p className="text-slate-400 text-sm">Thank you for playing Crease Code!</p>
         </div>
       </div>
     </div>

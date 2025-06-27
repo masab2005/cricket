@@ -12,22 +12,25 @@ function LoggedIN() {
   const [loading, setLoading] = useState(true);
   const isLoggedIn = useSelector((state) => state.auth.status);
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
       setLoading(true);
+      setError(null);
       
       try {
         const user = await authService.getCurrentUser();
         
         if (user) {
-          console.log("Session found. Dispatching login...");
           dispatch(login({ userData: user }));
           
           try {
             const gameData = await service.getUserInfo(user.$id);
             dispatch(updateUserData({ userGameData: gameData }));
           } catch (gameDataError) {
-            console.error("Error fetching game data:", gameDataError);
+            setError("Failed to load game data. Your progress might not be saved.");
+            // Continue anyway since authentication was successful
           }
           
           setLoading(false);
@@ -39,7 +42,6 @@ function LoggedIN() {
           navigate('/login');
         }
       } catch (error) {
-        console.error("Login check failed:", error);
         dispatch(logout());
         setLoading(false);
         navigate('/login');

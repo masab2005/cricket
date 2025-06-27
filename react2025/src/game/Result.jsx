@@ -11,14 +11,17 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
   const existingScore = userGameData?.score || 0;
   const currentIndex = (userGameData?.currentIndex || 0) + 1;
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   useEffect(() => {
     async function updateUserScoreAndIndex() {
       try {
         setLoading(true);
+        setError(null);
         const updatedUser = await service.updateUserScore(userData.$id,existingScore, currentScore, currentIndex);
         dispatch(updateUserData({ userGameData: updatedUser }));
       } catch (error) {
-        console.error('Error updating user data:', error);
+        setError("Failed to save your score. Your progress may not be updated.");
       } finally {
         setLoading(false);
       }
@@ -84,6 +87,17 @@ function Result({ isCorrect, correctAnswer, currentScore, imageUrl, onNext }) {
         {/* Result Details */}
         <div className="px-8 py-6 bg-gray-800">
           <div className="space-y-4">
+            {error && (
+              <div className="mb-4 bg-red-900/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
+                <div className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-red-400">{error}</p>
+                </div>
+              </div>
+            )}
+            
             <div className="flex justify-between items-center pb-3 border-b border-gray-700">
               <span className="text-gray-300">Correct Answer:</span>
               <span className="text-lg font-bold text-yellow-400">{correctAnswer}</span>

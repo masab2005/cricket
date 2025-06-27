@@ -5,6 +5,8 @@ function PlayerCard({ index }) {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState(null);
+  
   useEffect(() => {
   async function fetchPlayer() {
     console.log("Fetching player with index:", index); // log this

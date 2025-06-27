@@ -16,6 +16,8 @@ function NavBar() {
   const handleLogout = async () => {
     await authService.logout();
     dispatch(logout());
+    localStorage.removeItem('gameState');
+    localStorage.removeItem('persist:root');
     navigate('/login');
   };
 

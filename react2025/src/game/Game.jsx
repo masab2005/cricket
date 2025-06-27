@@ -46,11 +46,13 @@ function Game({onNext}) {
     }
   }, [revealedHints, count, userGameData?.currentIndex, correctAnswer]);
 
+const [error, setError] = useState(null);
+
 useEffect(() => {
   async function fetchPlayer() {
     try {
       setLoading(true);
-      console.log("Fetching player data for index:", userGameData?.currentIndex);
+      setError(null);
       if (userGameData?.currentIndex === undefined) return;
       
       const player = await service.getPlayer(userGameData.currentIndex); 
@@ -58,7 +60,7 @@ useEffect(() => {
         setHintValues(player.hints);
         setCorrectAnswer(player.playerName);
         setImageUrl(service.getFilePreview(player.imageID));
-        console.log("Fetched correct answer:", player.playerName);
+        
         const savedState = localStorage.getItem('gameState');
         if (savedState) {
           const parsedState = JSON.parse(savedState);
@@ -70,13 +72,12 @@ useEffect(() => {
           }
         }
       } else {
-        setLoading(false)
+        setLoading(false);
         localStorage.removeItem('gameState');
         navigate('/end');
-        console.log("Player not found"); 
       }
     } catch (error) {
-      console.error("Error fetching player data:", error);
+      setError("Unable to load player data. Please try again later.");
     } finally{
       setLoading(false);
     }
@@ -104,14 +105,16 @@ useEffect(() => {
     // Prevent empty input from being accepted as correct
     let isCorrect = false;
     if (normalizedGuess.length > 0) {
+      // Split answer into words (first name, last name, etc.)
       const answerWords = normalizedAnswer.split(/\s+/);
+      
+      // Check if guess exactly matches any word in the answer (first/last name)
       const isWordMatch = answerWords.some(word => word === normalizedGuess);
-      const isSubstringMatch = normalizedAnswer.includes(normalizedGuess);
-
+      
+      
       isCorrect =
-        normalizedGuess === normalizedAnswer ||
-        isWordMatch ||
-        isSubstringMatch;
+        normalizedGuess === normalizedAnswer || // Full name match
+        isWordMatch               // Significant substring match
     }
 
     setIsCorrect(isCorrect);
@@ -137,6 +140,32 @@ useEffect(() => {
 }, [isCorrect]);
 
   if (loading) return <LoadingSpinner/>
+  if (error) {
+    return (
+      <>
+        <Nav/>
+        <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8 px-4 sm:px-6 flex items-center justify-center">
+          <div className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden p-8 max-w-md w-full">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-xl text-center font-bold text-white mb-2">Error</h2>
+            <p className="text-slate-300 text-center mb-6">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
   if (isCorrect === true) {
     // Clear localStorage when game is completed
     localStorage.removeItem('gameState');
@@ -195,7 +224,7 @@ useEffect(() => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                  CRICKET <span className="text-amber-400 font-extrabold">MASTER</span>
+                  Crease <span className="text-amber-400 font-extrabold">code</span>
                 </h1>
                 <p className="text-slate-400 text-sm mt-1">Guess the player to earn points</p>
               </div>

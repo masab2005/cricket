@@ -49,6 +49,7 @@ class AuthService {
       await this.account.deleteSessions();
     } catch (error) {
       console.error("AuthService :: logout error", error);
+      throw error; // Propagate the error to be handled by the caller
     }
   }
 

@@ -44,7 +44,7 @@ function Game({onNext}) {
       };
       localStorage.setItem('gameState', JSON.stringify(gameState));
     }
-  }, [revealedHints, count, userGameData?.currentIndex, correctAnswer]);
+  }, [revealedHints, count, correctAnswer]);
 
 const [error, setError] = useState(null);
 
@@ -69,7 +69,12 @@ useEffect(() => {
             setCount(parsedState.count || 6);
           } else {
             localStorage.removeItem('gameState');
+            setRevealedHints([]);
+            setCount(6);
           }
+        } else {
+          setRevealedHints([]);
+          setCount(6);
         }
       } else {
         setLoading(false);
